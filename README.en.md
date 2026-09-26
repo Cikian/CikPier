@@ -4,6 +4,8 @@
 
 **A GUI client for frp on Windows — no config files, no console windows.**
 
+> 🪞 **Gitee mirror** (faster from mainland China): https://gitee.com/cikian/CikPier
+
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows-0078D4.svg)](#known-limitations)
 [![frp](https://img.shields.io/badge/frp-0.71.0-10B981.svg)](https://github.com/fatedier/frp)

@@ -4,6 +4,8 @@
 
 **给 frp 做的 Windows 图形客户端 —— 不碰配置文件、不出黑窗口、全中文。**
 
+> 🪞 **Gitee 镜像**（国内访问更快）：https://gitee.com/cikian/CikPier
+
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows-0078D4.svg)](#已知限制)
 [![frp](https://img.shields.io/badge/frp-0.71.0-10B981.svg)](https://github.com/fatedier/frp)
