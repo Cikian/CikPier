@@ -60,7 +60,7 @@ type AboutInfo struct {
 // 作者与项目信息。要改就改这里。
 const (
 	appName     = "CikPier"
-	appVersion  = "1.0.0"
+	appVersion  = "1.0.1"
 	appAuthor   = "Cikian"
 	appEmail    = "cikian@126.com"
 	appWebsite  = "https://www.cikian.cn"

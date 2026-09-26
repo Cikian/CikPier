@@ -60,8 +60,8 @@ Grab the build matching your CPU from [Releases](https://github.com/Cikian/CikPi
 
 | Your machine | Download |
 |---|---|
-| Regular PC (Intel / AMD) | `CikPier-v1.0.0-amd64.zip` |
-| Windows on ARM (Snapdragon, Surface Pro X) | `CikPier-v1.0.0-arm64.zip` |
+| Regular PC (Intel / AMD) | `CikPier-v1.0.1-amd64.zip` |
+| Windows on ARM (Snapdragon, Surface Pro X) | `CikPier-v1.0.1-arm64.zip` |
 
 Not sure which? **Settings → System → About**, look at "System type".
 

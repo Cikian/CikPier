@@ -51,8 +51,8 @@
 
 | 你的电脑 | 下载哪个 |
 |---|---|
-| 普通电脑（Intel / AMD 处理器） | `CikPier-v1.0.0-amd64.zip` |
-| ARM 电脑（骁龙处理器、Surface Pro X 等） | `CikPier-v1.0.0-arm64.zip` |
+| 普通电脑（Intel / AMD 处理器） | `CikPier-v1.0.1-amd64.zip` |
+| ARM 电脑（骁龙处理器、Surface Pro X 等） | `CikPier-v1.0.1-arm64.zip` |
 
 不确定是哪种？打开 **设置 → 系统 → 关于**，看「系统类型」那一行。
 
