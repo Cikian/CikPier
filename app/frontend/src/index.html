@@ -492,20 +492,38 @@
         <div class="hint" id="pf-remotePort-hint">由管理员分配。访问者通过 <span class="mono" id="pf-remotePort-eg">服务器地址:20001</span> 连到你的服务。填 0 表示让服务端随机分配。</div>
       </div>
 
-      <!-- 仅 http / https / tcpmux -->
-      <div class="field" data-show-for="http,https,tcpmux">
-        <label class="label">自定义域名</label>
-        <div class="chips" data-chips="customDomains">
-          <input placeholder="输入域名后按回车，可填多个">
-        </div>
-        <div class="hint">需要你自己配置 DNS 解析。它与下边的「子域名」互斥，二选一即可。</div>
-      </div>
-
-      <!-- 仅 http / https -->
+      <!-- 仅 http / https —— 子域名。这是绝大多数人该用的方式：不用碰 DNS -->
       <div class="field" data-show-for="http,https">
         <label class="label">子域名</label>
         <input class="input" id="pf-subdomain" placeholder="例如 mysql">
         <div class="hint" id="pf-subdomain-hint">只写最左边一段，实际访问地址由服务端拼成 <span class="mono">子域名.服务端域名</span></div>
+      </div>
+
+      <!-- 仅 http / https / tcpmux —— 自定义域名。
+           默认折叠：绝大多数人用上面的「子域名」就够了，展开它只会增加困惑。
+           TCPMUX 例外（没有子域名字段，域名是必填的），由 applyType 自动展开。 -->
+      <div class="fold" id="fold-customdomain" data-show-for="http,https,tcpmux" style="margin-top:var(--s5)">
+        <button class="fold-head" type="button">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>
+          自定义域名
+          <span class="muted" id="pf-customdomain-note" style="font-weight:400">一般不需要</span>
+        </button>
+        <div class="fold-body">
+          <div class="chips" data-chips="customDomains">
+            <input placeholder="输入域名后按回车，可填多个">
+          </div>
+          <div class="hint">
+            <p style="margin:0 0 9px"><b>一般不需要填。</b>用上面的「子域名」就够了 —— 服务端已经配好泛解析，你完全不用碰 DNS。</p>
+            <p style="margin:0 0 9px"><b>什么时候才填：</b>你有自己的域名，想让服务被它访问（例如 <span class="mono">db.你的域名.com</span>），而不是服务端分配的那个。可以填多个。</p>
+            <p style="margin:0 0 5px"><b>填了之后你必须做这两件事，否则外面访问不到：</b></p>
+            <ol style="margin:0 0 9px;padding-left:20px">
+              <li>在域名服务商那里加解析：<b>A 记录</b>指向服务端 IP，或 <b>CNAME</b> 指向服务端域名</li>
+              <li>确认服务端的 <b>80 / 443</b> 端口能从外网访问</li>
+            </ol>
+            <p style="margin:0 0 9px"><b>⚠ 不能填服务端泛解析域名下面的域名。</b>比如服务端配的是 <span class="mono">frp.example.com</span>，那 <span class="mono">a.frp.example.com</span> 会被服务端拒绝。</p>
+            <p style="margin:0"><b>和「子域名」不冲突</b> —— 两个都填也可以，frp 会把两个域名都指向这条代理。</p>
+          </div>
+        </div>
       </div>
 
       <!-- 仅 tcpmux -->

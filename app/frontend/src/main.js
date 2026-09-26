@@ -821,6 +821,18 @@ function applyType(type) {
   });
   $('pm-type-hint').textContent = TYPE_HINT[type] || '';
   $('healthcheck-path-field').classList.toggle('hidden', type !== 'http' && type !== 'https');
+
+  // 「自定义域名」折叠区：默认收起（绝大多数人用「子域名」就够了）。
+  // TCPMUX 例外 —— 它没有子域名字段，自定义域名是**必填**的
+  // （frp 校验：subdomain 和 customDomains 不能同时为空），所以强制展开并改写提示。
+  const cdFold = $('fold-customdomain');
+  if (cdFold) {
+    const required = type === 'tcpmux';
+    cdFold.dataset.foldForceOpen = required ? '1' : '';
+    $('pf-customdomain-note').textContent = required ? 'TCPMUX 必填' : '一般不需要';
+    setFoldOpen(cdFold, required || foldHasContent(cdFold));
+  }
+
   updateAddrPreview();
 }
 
@@ -875,23 +887,36 @@ function bindFolds() {
 }
 
 /**
- * 按折叠区里当前的内容决定要不要自动展开。
+ * 折叠区里是否已经有「非默认」的内容。
  *
- * 为什么需要：编辑一条"开着健康检查 / 加密 / 限速"的代理时，折叠区如果默认收起，
- * 用户**根本看不到这些设置是开着的**，很容易以为没开。所以只要里面有任何一项
- * 不是默认值，就自动展开一次。
+ * 用于决定要不要自动展开 —— 见 syncFoldOpen 的说明。
  */
-function syncFoldOpen(rootEl) {
-  const fold = rootEl.querySelector('.fold');
-  if (!fold) return;
+function foldHasContent(fold) {
   const body = fold.querySelector('.fold-body');
+  if (!body) return false;
   const hasText = Array.from(body.querySelectorAll('input'))
     .some((i) => (i.value || '').trim() !== '');
   const hasSwitch = Array.from(body.querySelectorAll('.switch'))
     .some((s) => s.classList.contains('on'));
   const hasChip = Array.from(body.querySelectorAll('.chips'))
     .some((c) => c.querySelector('.chip'));
-  setFoldOpen(fold, hasText || hasSwitch || hasChip);
+  return hasText || hasSwitch || hasChip;
+}
+
+/**
+ * 按折叠区里当前的内容决定要不要自动展开。**遍历全部折叠区**。
+ *
+ * 为什么需要：编辑一条"开着健康检查 / 加密 / 限速"的代理时，折叠区如果默认收起，
+ * 用户**根本看不到这些设置是开着的**，很容易以为没开。所以只要里面有任何一项
+ * 不是默认值，就自动展开一次。
+ *
+ * 另外尊重 `data-foldForceOpen="1"`：某些类型下折叠区里的字段是**必填**的
+ * （例如 TCPMUX 的自定义域名），由 applyType 打这个标记强制展开。
+ */
+function syncFoldOpen(rootEl) {
+  rootEl.querySelectorAll('.fold').forEach((fold) => {
+    setFoldOpen(fold, fold.dataset.foldForceOpen === '1' || foldHasContent(fold));
+  });
 }
 
 function openProxyModal(v) {
