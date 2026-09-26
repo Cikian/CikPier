@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="CikPier">
+  <title>CikPier</title>
+  <defs>
+    <!-- 三组渐变都按整块底板的高度铺开（userSpaceOnUse），
+         和 internal/icon 里的光栅化逻辑保持一致 -->
+    <linearGradient id="ckTile" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="64">
+      <stop offset="0" stop-color="#1E4072"/>
+      <stop offset="1" stop-color="#10223F"/>
+    </linearGradient>
+    <linearGradient id="ckWarm" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="64">
+      <stop offset="0" stop-color="#FBB03B"/>
+      <stop offset="1" stop-color="#F5821F"/>
+    </linearGradient>
+    <linearGradient id="ckCool" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="64">
+      <stop offset="0" stop-color="#59A9E6"/>
+      <stop offset="1" stop-color="#1B75BC"/>
+    </linearGradient>
+
+    <clipPath id="ckTileClip">
+      <rect x="0" y="0" width="64" height="64" rx="14.08"/>
+    </clipPath>
+  </defs>
+
+  <!--
+    斜分逻辑与 internal/icon 完全一致：以 (x - y) 为判据，缝的半宽 0.085。
+    换算到 64×64 画布就是 0.085 × 64 = 5.44。
+
+      暖色区（右上）：y < x - 5.44  → 三角形 (5.44,0) (64,0) (64,58.56)
+      冷色区（左下）：y > x + 5.44  → 三角形 (0,5.44) (0,64) (58.56,64)
+      中间那条斜缝不画，直接露出底板色
+
+    ⚠ 这几个顶点是算出来的，不是估的。第一版凭感觉写了两组六边形顶点，
+      结果两个色块直接贴在一起、缝整个没了 —— 改完一定和 cmd/genicon
+      出的那张预览对一眼。
+  -->
+  <g clip-path="url(#ckTileClip)">
+    <rect x="0" y="0" width="64" height="64" fill="url(#ckTile)"/>
+    <polygon fill="url(#ckCool)" points="0,5.44 0,64 58.56,64"/>
+    <polygon fill="url(#ckWarm)" points="5.44,0 64,0 64,58.56"/>
+  </g>
+</svg>

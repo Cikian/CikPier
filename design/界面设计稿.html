@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>frp 客户端 · 界面设计稿</title>
+<style>
+/* ==========================================================================
+   设计系统令牌（Design Tokens）
+   风格：Minimalism & Swiss Style —— 干净、留白、几何、无多余装饰
+   配色：纯白主体 + 薄荷绿主题色
+   ========================================================================== */
+:root{
+  /* ---- 薄荷绿主色阶 ---- */
+  --mint-50:#ECFDF5; --mint-100:#D1FAE5; --mint-200:#A7F3D0; --mint-300:#6EE7B7;
+  --mint-400:#34D399; --mint-500:#10B981; --mint-600:#059669; --mint-700:#047857;
+  --primary:var(--mint-500);
+  --primary-hover:var(--mint-600);
+  --primary-soft:var(--mint-50);
+  --primary-ring:rgba(16,185,129,.18);
+
+  /* ---- 中性阶（白底体系）---- */
+  --bg:#F7F9FB;          /* 内容区底色，比纯白低一档，让白卡片浮起来 */
+  --surface:#FFFFFF;     /* 卡片 / 侧边栏 / 顶栏 */
+  --surface-2:#F8FAFC;   /* 次级填充 */
+  --fg:#0F172A;
+  --fg-2:#475569;
+  --fg-3:#64748B;
+  --fg-4:#94A3B8;
+  --border:#E7EBF0;
+  --border-strong:#D5DBE3;
+
+  /* ---- 语义状态色 ---- */
+  --ok:#10B981;      --ok-bg:#ECFDF5;   --ok-fg:#047857;
+  --warn:#F59E0B;    --warn-bg:#FFFBEB; --warn-fg:#B45309;
+  --danger:#EF4444;  --danger-bg:#FEF2F2;--danger-fg:#B91C1C;
+  --info:#0EA5E9;    --info-bg:#F0F9FF; --info-fg:#0369A1;
+  --idle:#94A3B8;    --idle-bg:#F1F5F9; --idle-fg:#64748B;
+
+  /* ---- 排版 ---- */
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,"SF Mono",Menlo,monospace;
+
+  /* ---- 间距（8px 节奏）---- */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:20px; --s6:24px; --s8:32px; --s10:40px;
+
+  /* ---- 圆角 ---- */
+  --r-sm:6px; --r-md:8px; --r-lg:10px; --r-xl:14px; --r-full:999px;
+
+  /* ---- 阴影（极简：非必要不用，浮层才用）---- */
+  --sh-pop:0 6px 24px rgba(15,23,42,.10), 0 2px 6px rgba(15,23,42,.06);
+
+  /* ---- 动效（150–250ms，克制的微交互）---- */
+  --t:180ms cubic-bezier(.4,0,.2,1);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--font); background:var(--bg); color:var(--fg);
+  font-size:14px; line-height:1.6; -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit;font-size:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+svg{display:block;flex:none}
+::selection{background:var(--mint-200)}
+
+/* ==========================================================================
+   应用骨架
+   ========================================================================== */
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* ---------- 侧边栏 ---------- */
+.sidebar{
+  width:212px;flex:none;background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+}
+.brand{display:flex;align-items:center;gap:10px;padding:var(--s5) var(--s5) var(--s4)}
+.brand-mark{
+  width:30px;height:30px;border-radius:var(--r-md);flex:none;
+  background:linear-gradient(135deg,var(--mint-400),var(--mint-600));
+  display:grid;place-items:center;color:#fff;
+}
+.brand-text{display:flex;flex-direction:column;line-height:1.25}
+.brand-name{font-size:14px;font-weight:600;letter-spacing:-.01em}
+.brand-sub{font-size:11px;color:var(--fg-4)}
+
+.nav{padding:var(--s2) var(--s3);display:flex;flex-direction:column;gap:2px;flex:1}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r-md);
+  color:var(--fg-2);font-size:13.5px;font-weight:450;transition:background var(--t),color var(--t);
+  text-align:left;width:100%;position:relative;
+}
+.nav-item:hover{background:var(--surface-2);color:var(--fg)}
+.nav-item.active{background:var(--primary-soft);color:var(--mint-700);font-weight:600}
+.nav-item.active svg{color:var(--mint-600)}
+.nav-item .badge-count{
+  margin-left:auto;font-size:11px;font-weight:600;color:var(--fg-3);
+  background:var(--surface-2);border-radius:var(--r-full);padding:1px 7px;
+}
+.nav-item.active .badge-count{background:var(--mint-100);color:var(--mint-700)}
+.nav-group-label{
+  font-size:11px;font-weight:600;color:var(--fg-4);letter-spacing:.04em;
+  padding:var(--s5) 10px var(--s2);
+}
+.sidebar-foot{padding:var(--s4) var(--s5);border-top:1px solid var(--border);font-size:11.5px;color:var(--fg-4)}
+
+/* ---------- 主区 ---------- */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+
+/* ---------- 顶栏：连接状态 ---------- */
+.topbar{
+  height:56px;flex:none;background:var(--surface);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:var(--s4);padding:0 var(--s6);
+}
+.conn{display:flex;align-items:center;gap:9px;min-width:0}
+.dot{width:8px;height:8px;border-radius:50%;flex:none;position:relative}
+.dot.on{background:var(--ok);box-shadow:0 0 0 3px var(--ok-bg)}
+.dot.warn{background:var(--warn);box-shadow:0 0 0 3px var(--warn-bg)}
+.dot.off{background:var(--idle);box-shadow:0 0 0 3px var(--idle-bg)}
+.dot.err{background:var(--danger);box-shadow:0 0 0 3px var(--danger-bg)}
+.conn-text{font-size:13.5px;font-weight:550;white-space:nowrap}
+.conn-meta{
+  display:flex;align-items:center;gap:var(--s3);font-size:12.5px;color:var(--fg-3);
+  padding-left:var(--s4);border-left:1px solid var(--border);margin-left:var(--s1);
+}
+.conn-meta code{font-family:var(--mono);font-size:12px;color:var(--fg-2)}
+.topbar-spacer{flex:1}
+.topbar-actions{display:flex;align-items:center;gap:var(--s2)}
+
+/* ---------- 内容区 ---------- */
+.content{flex:1;overflow-y:auto;padding:var(--s6) var(--s6) var(--s10)}
+.page{max-width:1120px;margin:0 auto}
+.page-head{display:flex;align-items:flex-start;gap:var(--s4);margin-bottom:var(--s5)}
+.page-title{font-size:19px;font-weight:650;letter-spacing:-.015em}
+.page-desc{font-size:13px;color:var(--fg-3);margin-top:2px}
+.page-head-actions{margin-left:auto;display:flex;gap:var(--s2);align-items:center}
+
+/* ==========================================================================
+   通用组件
+   ========================================================================== */
+
+/* ---------- 按钮 ---------- */
+.btn{
+  display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 13px;
+  border-radius:var(--r-sm);font-size:13px;font-weight:520;
+  transition:background var(--t),border-color var(--t),color var(--t);
+  border:1px solid transparent;white-space:nowrap;
+}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-hover)}
+.btn-ghost{background:var(--surface);border-color:var(--border-strong);color:var(--fg-2)}
+.btn-ghost:hover{background:var(--surface-2);border-color:var(--fg-4);color:var(--fg)}
+.btn-quiet{color:var(--fg-3);padding:0 9px}
+.btn-quiet:hover{background:var(--surface-2);color:var(--fg)}
+.btn-danger-ghost{background:var(--surface);border-color:var(--border-strong);color:var(--danger-fg)}
+.btn-danger-ghost:hover{background:var(--danger-bg);border-color:#FCA5A5}
+.btn-sm{height:29px;padding:0 10px;font-size:12.5px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* 图标按钮 */
+.icon-btn{
+  width:30px;height:30px;border-radius:var(--r-sm);display:grid;place-items:center;
+  color:var(--fg-4);transition:background var(--t),color var(--t);
+}
+.icon-btn:hover{background:var(--surface-2);color:var(--fg)}
+.icon-btn.danger:hover{background:var(--danger-bg);color:var(--danger-fg)}
+
+/* ---------- 开关 ---------- */
+.switch{
+  width:38px;height:22px;border-radius:var(--r-full);background:var(--border-strong);
+  position:relative;transition:background var(--t);flex:none;cursor:pointer;
+}
+.switch::after{
+  content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 2px rgba(15,23,42,.18);transition:transform var(--t);
+}
+.switch.on{background:var(--primary)}
+.switch.on::after{transform:translateX(16px)}
+.switch.sm{width:32px;height:18px}
+.switch.sm::after{width:12px;height:12px;top:3px;left:3px}
+.switch.sm.on::after{transform:translateX(14px)}
+
+/* ---------- 状态徽标 ---------- */
+.pill{
+  display:inline-flex;align-items:center;gap:5px;height:23px;padding:0 9px;
+  border-radius:var(--r-full);font-size:12px;font-weight:550;white-space:nowrap;
+}
+.pill i{width:6px;height:6px;border-radius:50%;display:block}
+.pill.ok{background:var(--ok-bg);color:var(--ok-fg)} .pill.ok i{background:var(--ok)}
+.pill.warn{background:var(--warn-bg);color:var(--warn-fg)} .pill.warn i{background:var(--warn)}
+.pill.err{background:var(--danger-bg);color:var(--danger-fg)} .pill.err i{background:var(--danger)}
+.pill.idle{background:var(--idle-bg);color:var(--idle-fg)} .pill.idle i{background:var(--idle)}
+.pill.info{background:var(--info-bg);color:var(--info-fg)} .pill.info i{background:var(--info)}
+
+/* ---------- 类型标签 ---------- */
+.tag{
+  display:inline-block;font-family:var(--mono);font-size:11.5px;font-weight:600;
+  padding:1px 7px;border-radius:var(--r-sm);background:var(--surface-2);
+  color:var(--fg-2);border:1px solid var(--border);letter-spacing:.02em;
+}
+
+/* ---------- 卡片 ---------- */
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
+  overflow:hidden;
+}
+.card-head{
+  display:flex;align-items:center;gap:var(--s3);
+  padding:var(--s4) var(--s5);border-bottom:1px solid var(--border);
+}
+.card-title{font-size:14px;font-weight:600}
+.card-sub{font-size:12.5px;color:var(--fg-3);font-weight:400}
+.card-body{padding:var(--s5)}
+
+/* ---------- 工具条（筛选）---------- */
+.toolbar{display:flex;align-items:center;gap:var(--s3);margin-bottom:var(--s4)}
+.search{
+  position:relative;flex:1;max-width:300px;
+}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--fg-4)}
+.search input{
+  width:100%;height:34px;padding:0 12px 0 34px;border-radius:var(--r-sm);
+  border:1px solid var(--border-strong);background:var(--surface);outline:none;
+  transition:border-color var(--t),box-shadow var(--t);
+}
+.search input::placeholder{color:var(--fg-4)}
+.search input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-ring)}
+.filter-select{
+  height:34px;padding:0 30px 0 11px;border-radius:var(--r-sm);
+  border:1px solid var(--border-strong);background:var(--surface);outline:none;
+  appearance:none;color:var(--fg-2);font-size:13px;
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 9px center;
+  transition:border-color var(--t),box-shadow var(--t);
+}
+.filter-select:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-ring)}
+
+/* ---------- 代理列表 ---------- */
+.list{display:flex;flex-direction:column}
+.row{
+  display:grid;grid-template-columns:minmax(140px,1.4fr) 74px minmax(150px,1.5fr) minmax(150px,1.5fr) 104px 108px;
+  align-items:center;gap:var(--s4);padding:13px var(--s5);
+  border-bottom:1px solid var(--border);transition:background var(--t);
+}
+.row:last-child{border-bottom:none}
+.row.head{
+  background:var(--surface-2);font-size:11.5px;font-weight:600;color:var(--fg-4);
+  letter-spacing:.03em;padding-top:9px;padding-bottom:9px;
+}
+.row:not(.head):hover{background:#FCFDFE}
+.row-name{display:flex;align-items:center;gap:9px;font-weight:560;min-width:0}
+.row-name span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.addr{font-family:var(--mono);font-size:12px;color:var(--fg-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.addr.dim{color:var(--fg-4)}
+.row-actions{display:flex;align-items:center;gap:var(--s2);justify-content:flex-end}
+.err-line{font-size:11.5px;color:var(--danger-fg);margin-top:1px}
+
+/* ---------- 空状态 / 提示条 ---------- */
+.empty{text-align:center;padding:var(--s10) var(--s6)}
+.empty-icon{
+  width:46px;height:46px;border-radius:var(--r-lg);background:var(--surface-2);
+  display:grid;place-items:center;margin:0 auto var(--s4);color:var(--fg-4);
+}
+.empty-title{font-size:14px;font-weight:600;margin-bottom:var(--s1)}
+.empty-desc{font-size:13px;color:var(--fg-3);max-width:380px;margin:0 auto var(--s5)}
+
+.notice{
+  display:flex;gap:var(--s3);padding:13px var(--s4);border-radius:var(--r-md);
+  font-size:13px;margin-bottom:var(--s4);align-items:flex-start;
+}
+.notice.warn{background:var(--warn-bg);color:var(--warn-fg);border:1px solid #FDE68A}
+.notice.err{background:var(--danger-bg);color:var(--danger-fg);border:1px solid #FECACA}
+.notice.info{background:var(--info-bg);color:var(--info-fg);border:1px solid #BAE6FD}
+.notice b{font-weight:600}
+.notice .notice-body{flex:1;min-width:0}
+.notice .notice-actions{display:flex;gap:var(--s2);margin-top:var(--s3)}
+
+/* ---------- 表单 ---------- */
+.field{margin-bottom:var(--s5)}
+.field:last-child{margin-bottom:0}
+.label{display:block;font-size:13px;font-weight:550;margin-bottom:6px}
+.label .req{color:var(--danger);margin-left:2px}
+.hint{font-size:12px;color:var(--fg-3);margin-top:5px;line-height:1.55}
+.input,.select,.textarea{
+  width:100%;height:37px;padding:0 12px;border-radius:var(--r-sm);
+  border:1px solid var(--border-strong);background:var(--surface);outline:none;
+  transition:border-color var(--t),box-shadow var(--t);
+}
+.textarea{height:auto;padding:9px 12px;resize:vertical;font-family:var(--mono);font-size:12.5px;line-height:1.6}
+.input:focus,.select:focus,.textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-ring)}
+.input.err{border-color:var(--danger)}
+.input::placeholder{color:var(--fg-4)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:var(--s5)}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--s5)}
+
+/* 类型选择卡片 */
+.type-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s2)}
+.type-card{
+  border:1px solid var(--border-strong);border-radius:var(--r-md);padding:11px 10px;
+  text-align:center;transition:all var(--t);background:var(--surface);
+}
+.type-card:hover{border-color:var(--mint-300);background:var(--mint-50)}
+.type-card.on{border-color:var(--primary);background:var(--primary-soft);box-shadow:0 0 0 2px var(--primary-ring)}
+.type-card .t{font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:.03em}
+.type-card .d{font-size:11px;color:var(--fg-3);margin-top:1px}
+.type-card.on .t{color:var(--mint-700)}
+
+/* 分段选择器（后端方式） */
+.seg{
+  height:34px;padding:0 15px;border-radius:var(--r-sm);border:1px solid var(--border-strong);
+  background:var(--surface);color:var(--fg-2);font-size:13px;font-weight:500;
+  transition:background var(--t),border-color var(--t),color var(--t);white-space:nowrap;
+}
+.seg:hover{border-color:var(--mint-300);color:var(--fg)}
+.seg.on{background:var(--primary-soft);border-color:var(--primary);color:var(--mint-700);font-weight:600}
+
+/* token 输入组 */
+.input-group{display:flex;gap:var(--s2)}
+.input-group .input{flex:1;font-family:var(--mono);font-size:12.5px}
+
+/* ---------- 弹窗 ---------- */
+.scrim{
+  position:fixed;inset:0;background:rgba(15,23,42,.42);
+  display:grid;place-items:center;padding:var(--s6);z-index:50;
+}
+.modal{
+  background:var(--surface);border-radius:var(--r-xl);box-shadow:var(--sh-pop);
+  width:100%;max-width:620px;max-height:86vh;display:flex;flex-direction:column;
+  animation:pop var(--t);
+}
+.modal.sm{max-width:430px}
+@keyframes pop{from{opacity:0;transform:translateY(6px) scale(.99)}to{opacity:1;transform:none}}
+.modal-head{display:flex;align-items:center;gap:var(--s3);padding:var(--s5) var(--s6);border-bottom:1px solid var(--border)}
+.modal-title{font-size:15.5px;font-weight:650}
+.modal-body{padding:var(--s6);overflow-y:auto}
+.modal-foot{display:flex;gap:var(--s2);justify-content:flex-end;padding:var(--s4) var(--s6);border-top:1px solid var(--border);background:var(--surface-2);border-radius:0 0 var(--r-xl) var(--r-xl)}
+
+/* 折叠区 */
+.fold{border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden}
+.fold-head{
+  display:flex;align-items:center;gap:var(--s2);padding:11px var(--s4);
+  font-size:13px;font-weight:600;background:var(--surface-2);width:100%;text-align:left;
+}
+.fold-head svg{transition:transform var(--t);color:var(--fg-4)}
+.fold.open .fold-head svg{transform:rotate(90deg)}
+.fold-body{display:none;padding:var(--s4);border-top:1px solid var(--border)}
+.fold.open .fold-body{display:block}
+
+/* ==========================================================================
+   日志页
+   ========================================================================== */
+.log-list{display:flex;flex-direction:column}
+.log-item{border-bottom:1px solid var(--border);padding:12px var(--s5)}
+.log-item:last-child{border-bottom:none}
+.log-item:hover{background:#FCFDFE}
+.log-top{display:flex;align-items:center;gap:var(--s3);margin-bottom:3px}
+.log-time{font-family:var(--mono);font-size:11.5px;color:var(--fg-4);flex:none}
+.log-scope{font-family:var(--mono);font-size:11.5px;color:var(--fg-3)}
+.log-msg{font-size:13.5px;font-weight:520}
+.log-detail{font-size:12.5px;color:var(--fg-3);margin-top:2px}
+.log-raw-btn{
+  display:inline-flex;align-items:center;gap:4px;font-size:11.5px;color:var(--fg-4);
+  margin-top:6px;transition:color var(--t);
+}
+.log-raw-btn:hover{color:var(--mint-600)}
+.log-raw-btn svg{transition:transform var(--t)}
+.log-item.open .log-raw-btn svg{transform:rotate(90deg)}
+.log-raw{
+  display:none;margin-top:var(--s2);padding:10px 12px;background:#0F172A;color:#CBD5E1;
+  border-radius:var(--r-sm);font-family:var(--mono);font-size:11.5px;line-height:1.65;
+  overflow-x:auto;white-space:pre-wrap;word-break:break-all;
+}
+.log-item.open .log-raw{display:block}
+
+/* ==========================================================================
+   设置页
+   ========================================================================== */
+.setting-row{
+  display:flex;align-items:center;gap:var(--s4);
+  padding:var(--s4) 0;border-bottom:1px solid var(--border);
+}
+.setting-row:last-child{border-bottom:none}
+.setting-text{flex:1;min-width:0}
+.setting-name{font-size:13.5px;font-weight:550}
+.setting-desc{font-size:12.5px;color:var(--fg-3);margin-top:2px}
+
+/* 页脚辅助 */
+.hidden{display:none !important}
+.muted{color:var(--fg-3)}
+.mono{font-family:var(--mono)}
+.design-note{
+  max-width:1120px;margin:0 auto var(--s5);padding:11px var(--s4);
+  background:var(--mint-50);border:1px solid var(--mint-200);border-radius:var(--r-md);
+  font-size:12.5px;color:var(--mint-700);display:flex;gap:var(--s3);align-items:flex-start;
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ================= 侧边栏 ================= -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 7h16M4 12h10M4 17h7"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="brand-name">frp 客户端</div>
+        <div class="brand-sub">v0.71.0</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-item active" data-page="proxies">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        代理
+        <span class="badge-count">3</span>
+      </button>
+      <button class="nav-item" data-page="logs">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>
+        日志
+      </button>
+      <button class="nav-item" data-page="settings">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        设置
+      </button>
+
+      <div class="nav-group-label">进阶</div>
+      <button class="nav-item" data-page="visitors">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        访问者
+      </button>
+      <button class="nav-item" data-page="diagnose">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        连接诊断
+      </button>
+    </nav>
+
+    <div class="sidebar-foot">登录身份：Cikian</div>
+  </aside>
+
+  <!-- ================= 主区 ================= -->
+  <div class="main">
+    <!-- 顶栏：连接状态 -->
+    <header class="topbar">
+      <div class="conn">
+        <span class="dot on"></span>
+        <span class="conn-text">已连接到服务端</span>
+      </div>
+      <div class="conn-meta">
+        <span>服务器 <code>frp.cikian.cn:7000</code></span>
+        <span>身份 <code>Cikian</code></span>
+      </div>
+      <div class="topbar-spacer"></div>
+      <div class="topbar-actions">
+        <span class="muted" style="font-size:12.5px">刚刚更新</span>
+        <button class="icon-btn" title="刷新">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ============================================================
+           页面 1：代理
+           ============================================================ -->
+      <div class="page" id="page-proxies">
+        <div class="design-note">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-top:2px"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <div>这是界面设计稿，用于确认视觉方向。所有交互都可点击。</div>
+        </div>
+
+        <div class="page-head">
+          <div>
+            <div class="page-title">代理</div>
+            <div class="page-desc">发布本机服务到公网。每条代理都可单独启用或停用。</div>
+          </div>
+          <div class="page-head-actions">
+            <button class="btn btn-ghost" onclick="alert('导出配置（设计稿演示）')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+              导出
+            </button>
+            <button class="btn btn-primary" onclick="openModal()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              新建代理
+            </button>
+          </div>
+        </div>
+
+        <!-- 提示：检测到配置文件里有代理 -->
+        <div class="notice warn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-top:2px"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+          <div class="notice-body">
+            <b>在配置文件里检测到 8 个代理，它们无法在界面中管理。</b>
+            <div style="margin-top:2px;opacity:.85">这些代理写在 frpc.toml 中，只能查看状态、无法启停或编辑。建议迁移到界面里统一管理。</div>
+            <div class="notice-actions">
+              <button class="btn btn-sm btn-primary" onclick="alert('一键迁移（设计稿演示）')">一键迁移到界面</button>
+              <button class="btn btn-sm btn-ghost" style="background:transparent">暂不处理</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 工具条 -->
+        <div class="toolbar">
+          <div class="search">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input placeholder="搜索代理名称或地址…">
+          </div>
+          <select class="filter-select"><option>全部类型</option><option>TCP</option><option>UDP</option><option>HTTP</option><option>HTTPS</option><option>STCP</option></select>
+          <select class="filter-select"><option>全部状态</option><option>运行中</option><option>已停用</option><option>启动失败</option></select>
+          <div style="flex:1"></div>
+          <span class="muted" style="font-size:12.5px">共 3 条</span>
+        </div>
+
+        <!-- 列表 -->
+        <div class="card">
+          <div class="list">
+            <div class="row head">
+              <div>名称</div><div>类型</div><div>本机服务</div><div>对外地址</div><div>状态</div><div style="text-align:right">操作</div>
+            </div>
+
+            <div class="row">
+              <div class="row-name">
+                <span class="dot on" style="width:7px;height:7px;box-shadow:none"></span>
+                <span>web</span>
+              </div>
+              <div><span class="tag">http</span></div>
+              <div class="addr">127.0.0.1:8080</div>
+              <div class="addr">web.frp.cikian.cn</div>
+              <div><span class="pill ok"><i></i>运行中</span></div>
+              <div class="row-actions">
+                <div class="switch on" onclick="this.classList.toggle('on')" title="启用 / 停用"></div>
+                <button class="icon-btn" title="编辑" onclick="openModal()">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+                </button>
+                <button class="icon-btn danger" title="删除">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="row-name">
+                <span class="dot on" style="width:7px;height:7px;box-shadow:none"></span>
+                <span>mysql</span>
+              </div>
+              <div><span class="tag">tcp</span></div>
+              <div class="addr">127.0.0.1:3306</div>
+              <div class="addr">frp.cikian.cn:20001</div>
+              <div><span class="pill ok"><i></i>运行中</span></div>
+              <div class="row-actions">
+                <div class="switch on" onclick="this.classList.toggle('on')" title="启用 / 停用"></div>
+                <button class="icon-btn" title="编辑" onclick="openModal()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+                <button class="icon-btn danger" title="删除"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg></button>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="row-name">
+                <span class="dot off" style="width:7px;height:7px;box-shadow:none"></span>
+                <span style="color:var(--fg-4)">nas</span>
+              </div>
+              <div><span class="tag">http</span></div>
+              <div class="addr dim">127.0.0.1:5000</div>
+              <div class="addr dim">nas.frp.cikian.cn</div>
+              <div><span class="pill idle"><i></i>已停用</span></div>
+              <div class="row-actions">
+                <div class="switch" onclick="this.classList.toggle('on')" title="启用 / 停用"></div>
+                <button class="icon-btn" title="编辑" onclick="openModal()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+                <button class="icon-btn danger" title="删除"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 状态变体演示 -->
+        <div style="margin-top:var(--s8)">
+          <div class="page-desc" style="margin-bottom:var(--s3)">↓ 状态样式参考（设计稿说明，不属于正式界面）</div>
+          <div class="card"><div class="card-body" style="display:flex;gap:var(--s3);flex-wrap:wrap">
+            <span class="pill ok"><i></i>运行中</span>
+            <span class="pill warn"><i></i>正在启动</span>
+            <span class="pill warn"><i></i>等待启动</span>
+            <span class="pill err"><i></i>启动失败</span>
+            <span class="pill err"><i></i>健康检查失败</span>
+            <span class="pill idle"><i></i>已停用</span>
+            <span class="pill idle"><i></i>已关闭</span>
+            <span class="pill info"><i></i>等待中</span>
+          </div></div>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           页面 2：日志
+           ============================================================ -->
+      <div class="page hidden" id="page-logs">
+        <div class="page-head">
+          <div>
+            <div class="page-title">日志</div>
+            <div class="page-desc">默认显示中文摘要，点击可展开 frp 的原始英文日志。</div>
+          </div>
+          <div class="page-head-actions">
+            <button class="btn btn-ghost">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+              导出
+            </button>
+            <button class="btn btn-ghost">清空</button>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="search">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input placeholder="搜索日志…">
+          </div>
+          <select class="filter-select"><option>全部级别</option><option>信息</option><option>警告</option><option>错误</option></select>
+          <div style="flex:1"></div>
+          <button class="btn btn-ghost btn-sm">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>
+            暂停滚动
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="log-list">
+            <div class="log-item">
+              <div class="log-top">
+                <span class="log-time">20:29:29</span>
+                <span class="pill ok" style="height:20px;font-size:11.5px"><i></i>信息</span>
+                <span class="log-scope">[web]</span>
+              </div>
+              <div class="log-msg">代理已上线，对外地址 web.frp.cikian.cn</div>
+              <button class="log-raw-btn" onclick="this.closest('.log-item').classList.toggle('open')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>
+                查看原始日志
+              </button>
+              <div class="log-raw">2026-09-24 20:29:29.412 [I] [client/control.go:174] [0ab2ace915055641] [web] start proxy success</div>
+            </div>
+
+            <div class="log-item open">
+              <div class="log-top">
+                <span class="log-time">20:30:39</span>
+                <span class="pill warn" style="height:20px;font-size:11.5px"><i></i>警告</span>
+                <span class="log-scope">[tcp-demo]</span>
+              </div>
+              <div class="log-msg">健康检查失败：本机 127.0.0.1:22 拒绝连接</div>
+              <div class="log-detail">该代理配置了健康检查，但本机 22 端口没有服务在监听。在服务启动前，这条代理不会被发布出去。</div>
+              <button class="log-raw-btn" onclick="this.closest('.log-item').classList.toggle('open')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>
+                收起原始日志
+              </button>
+              <div class="log-raw">2026-09-24 20:30:39.421 [W] [health/health.go:128] [0ab2ace915055641] [tcp-demo] do one health check failed: dial tcp 127.0.0.1:22: connectex: No connection could be made because the target machine actively refused it.</div>
+            </div>
+
+            <div class="log-item">
+              <div class="log-top">
+                <span class="log-time">20:31:02</span>
+                <span class="pill err" style="height:20px;font-size:11.5px"><i></i>错误</span>
+                <span class="log-scope">[tcpmux-demo]</span>
+              </div>
+              <div class="log-msg">启动失败：服务端未开启 TCPMUX 功能</div>
+              <div class="log-detail">服务端没有配置 tcpmuxHTTPConnectPort，无法创建 tcpmux 类型的代理。请联系管理员开启，或删除这条代理。</div>
+              <button class="log-raw-btn" onclick="this.closest('.log-item').classList.toggle('open')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>
+                查看原始日志
+              </button>
+              <div class="log-raw">2026-09-24 20:31:02.691 [W] [client/control.go:172] [0ab2ace915055641] [tcpmux-demo] start error: tcpmux with multiplexer httpconnect not supported because this feature is not enabled in server</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           页面 3：设置
+           ============================================================ -->
+      <div class="page hidden" id="page-settings">
+        <div class="page-head">
+          <div>
+            <div class="page-title">设置</div>
+            <div class="page-desc">连接配置与启动选项。修改后需要重启 frp 生效。</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:var(--s5)">
+          <div class="card-head"><div class="card-title">连接配置</div></div>
+          <div class="card-body">
+            <div class="grid-2">
+              <div class="field">
+                <label class="label">服务器地址<span class="req">*</span></label>
+                <input class="input" value="frp.cikian.cn">
+                <div class="hint">管理员提供给你的 frp 服务端域名或 IP</div>
+              </div>
+              <div class="field">
+                <label class="label">服务器端口<span class="req">*</span></label>
+                <input class="input" value="7500">
+                <div class="hint"><b>默认 7000</b>。只有管理员使用了非标准端口时才需要改。当前值来自你的配置文件，程序不会自动重置它。</div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="label">认证令牌 Token<span class="req">*</span></label>
+              <div class="input-group">
+                <input class="input" type="password" value="k7Jf2mQ9xLp3vN8sT5wY1zA6bC4dE0fG" id="token-input">
+                <button class="btn btn-ghost" onclick="toggleToken()" id="token-btn">显示</button>
+              </div>
+              <div class="hint">由管理员分配。这是访问服务器的钥匙，请勿外传或截图分享。</div>
+            </div>
+
+            <div class="field">
+              <label class="label">你的身份标识<span class="req">*</span></label>
+              <input class="input" value="Cikian">
+              <div class="hint">用于在服务端区分不同客户端，代理名会自动加上此前缀</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:var(--s5)">
+          <div class="card-head"><div class="card-title">启动选项</div></div>
+          <div class="card-body" style="padding-top:0;padding-bottom:0">
+            <div class="setting-row">
+              <div class="setting-text">
+                <div class="setting-name">开机自动启动</div>
+                <div class="setting-desc">电脑开机后自动启动本程序（并同时启动 frp 服务）</div>
+              </div>
+              <div class="switch on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-text">
+                <div class="setting-name">关闭窗口时最小化到托盘</div>
+                <div class="setting-desc">关闭窗口后程序继续在后台运行，frp 服务不会中断</div>
+              </div>
+              <div class="switch" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-text">
+                <div class="setting-name">自动重连</div>
+                <div class="setting-desc">连接断开时自动重试，无需手动干预</div>
+              </div>
+              <div class="switch on" onclick="this.classList.toggle('on')"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div class="card-title">高级</div></div>
+          <div class="card-body" style="display:flex;gap:var(--s2);flex-wrap:wrap">
+            <button class="btn btn-ghost">打开官方管理页面</button>
+            <button class="btn btn-ghost">打开配置文件夹</button>
+            <button class="btn btn-ghost">备份配置</button>
+            <button class="btn btn-ghost">重置为默认</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           页面 4：访问者（进阶）
+           ============================================================ -->
+      <div class="page hidden" id="page-visitors">
+        <div class="page-head">
+          <div>
+            <div class="page-title">访问者</div>
+            <div class="page-desc">访问别人发布的私密服务（stcp / sudp / xtcp）。</div>
+          </div>
+          <div class="page-head-actions">
+            <button class="btn btn-primary">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              新建访问者
+            </button>
+          </div>
+        </div>
+
+        <div class="notice info">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-top:2px"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <div class="notice-body">
+            <b>什么时候需要「访问者」？</b>
+            <div style="margin-top:3px;line-height:1.65">
+              只有当你要 <b>访问别人发布的私密服务</b>（stcp / sudp / xtcp）时才需要。<br>
+              配好之后，对方的服务会映射到你本机的一个端口上，像访问本地服务一样使用它。<br>
+              <span style="opacity:.85">如果你只是要发布自己的服务，用「代理」就够了，不需要这里。</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="list">
+            <div class="row head">
+              <div>名称</div><div>类型</div><div>目标服务</div><div>本机映射</div><div>状态</div><div style="text-align:right">操作</div>
+            </div>
+            <div class="row">
+              <div class="row-name"><span class="dot on" style="width:7px;height:7px;box-shadow:none"></span><span>张三的 MySQL</span></div>
+              <div><span class="tag">stcp</span></div>
+              <div class="addr">zhangsan / mysql</div>
+              <div class="addr">127.0.0.1:13306</div>
+              <div><span class="pill ok"><i></i>运行中</span></div>
+              <div class="row-actions">
+                <div class="switch on" onclick="this.classList.toggle('on')"></div>
+                <button class="icon-btn" title="编辑"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+                <button class="icon-btn danger" title="删除"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           页面 5：连接诊断
+           ============================================================ -->
+      <div class="page hidden" id="page-diagnose">
+        <div class="page-head">
+          <div>
+            <div class="page-title">连接诊断</div>
+            <div class="page-desc">一键检查三个关键环节，出问题时可快速定位。</div>
+          </div>
+          <div class="page-head-actions">
+            <button class="btn btn-primary">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              开始诊断
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body" style="padding-top:0;padding-bottom:0">
+            <div class="setting-row">
+              <div style="width:26px;height:26px;border-radius:50%;background:var(--ok-bg);display:grid;place-items:center;flex:none">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+              </div>
+              <div class="setting-text">
+                <div class="setting-name">服务端可达</div>
+                <div class="setting-desc">已连通 frp.cikian.cn:7000，耗时 23ms</div>
+              </div>
+            </div>
+            <div class="setting-row">
+              <div style="width:26px;height:26px;border-radius:50%;background:var(--ok-bg);display:grid;place-items:center;flex:none">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+              </div>
+              <div class="setting-text">
+                <div class="setting-name">认证通过</div>
+                <div class="setting-desc">Token 校验成功，已获取会话 ID</div>
+              </div>
+            </div>
+            <div class="setting-row">
+              <div style="width:26px;height:26px;border-radius:50%;background:var(--warn-bg);display:grid;place-items:center;flex:none">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--warn)" stroke-width="2.6" stroke-linecap="round"><path d="M12 8v5M12 16h.01"/></svg>
+              </div>
+              <div class="setting-text">
+                <div class="setting-name">本机后端服务</div>
+                <div class="setting-desc" style="color:var(--warn-fg)">代理 <b>tcp-demo</b> 指向的 127.0.0.1:22 没有服务在监听，该代理无法正常工作</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 新建 / 编辑代理弹窗 ==================== -->
+<div class="scrim hidden" id="modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">新建代理</div>
+      <div style="flex:1"></div>
+      <button class="icon-btn" onclick="closeModal()">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="field">
+        <label class="label">代理类型<span class="req">*</span></label>
+        <div class="type-grid">
+          <button class="type-card on" data-type="tcp"><div class="t">TCP</div><div class="d">端口</div></button>
+          <button class="type-card" data-type="udp"><div class="t">UDP</div><div class="d">端口</div></button>
+          <button class="type-card" data-type="http"><div class="t">HTTP</div><div class="d">域名</div></button>
+          <button class="type-card" data-type="https"><div class="t">HTTPS</div><div class="d">域名</div></button>
+          <button class="type-card" data-type="tcpmux"><div class="t">TCPMUX</div><div class="d">复用</div></button>
+          <button class="type-card" data-type="stcp"><div class="t">STCP</div><div class="d">私密</div></button>
+          <button class="type-card" data-type="sudp"><div class="t">SUDP</div><div class="d">私密</div></button>
+          <button class="type-card" data-type="xtcp"><div class="t">XTCP</div><div class="d">P2P</div></button>
+        </div>
+        <div class="hint">不确定选哪个？发布网站选 <b>HTTP</b>，发布数据库/远程桌面选 <b>TCP</b>，只给特定人访问选 <b>STCP</b>。</div>
+      </div>
+
+      <div class="field">
+        <label class="label">名称<span class="req">*</span></label>
+        <input class="input" value="mysql">
+        <div class="hint">代理的唯一标识，只能用字母、数字、连字符</div>
+      </div>
+
+      <!-- ============ 按类型显示：对外端口（仅 tcp / udp）============ -->
+      <div class="field" data-show-for="tcp,udp">
+        <label class="label">对外端口<span class="req">*</span></label>
+        <input class="input" value="20001">
+        <div class="hint">由管理员分配。访问者通过 <span class="mono">frp.cikian.cn:20001</span> 连到你的服务。填 0 表示让服务端随机分配。</div>
+      </div>
+
+      <!-- ============ 按类型显示：域名（http / https / tcpmux）============ -->
+      <div class="field" data-show-for="http,https,tcpmux">
+        <label class="label">自定义域名</label>
+        <input class="input" placeholder="输入后按回车，可填多个">
+        <div class="hint">需要你自己配置 DNS 解析。它与下边的「子域名」互斥，二选一即可。</div>
+      </div>
+
+      <div class="field" data-show-for="http,https">
+        <label class="label">子域名</label>
+        <input class="input" value="mysql">
+        <div class="hint">只写最左边一段，实际访问地址为 <span class="mono">mysql.frp.cikian.cn</span></div>
+      </div>
+
+      <div class="field" data-show-for="tcpmux">
+        <label class="label">多路复用器</label>
+        <select class="select"><option>HTTP CONNECT</option></select>
+        <div class="hint">目前仅支持 httpconnect</div>
+      </div>
+
+      <!-- ============ 按类型显示：密钥（stcp / sudp / xtcp）============ -->
+      <div class="field" data-show-for="stcp,sudp,xtcp">
+        <label class="label">密钥 Secret Key<span class="req">*</span></label>
+        <div class="input-group">
+          <input class="input" type="password" value="Zx8kQ2mN5pR7tV1w">
+          <button class="btn btn-ghost">显示</button>
+          <button class="btn btn-ghost">随机生成</button>
+        </div>
+        <div class="hint">访问者必须输入完全相同的密钥才能连接。密钥泄露等于服务对泄露者开放。</div>
+      </div>
+
+      <div class="field" data-show-for="stcp,sudp,xtcp">
+        <label class="label">允许访问的用户</label>
+        <input class="input" placeholder="输入后按回车，留空表示仅同一身份可访问">
+        <div class="hint">留空 = 只有 <span class="mono">user</span> 相同的访问者能连；填 <span class="mono">*</span> = 允许所有人</div>
+      </div>
+
+      <div style="border-top:1px solid var(--border);margin:var(--s5) 0"></div>
+
+      <!-- ============ 第 2 层：后端方式 ============ -->
+      <div class="field">
+        <label class="label">后端方式</label>
+        <div style="display:flex;gap:var(--s2)">
+          <button class="seg on" data-backend="direct" onclick="setBackend('direct')">直连本机端口</button>
+          <button class="seg" data-backend="plugin" onclick="setBackend('plugin')">使用插件</button>
+        </div>
+        <div class="hint">插件模式下不需要填本机端口，由插件负责处理连接（例如把本地 HTTP 转成 HTTPS、或直接提供文件服务）。</div>
+      </div>
+
+      <!-- 直连 -->
+      <div class="grid-2" data-show-backend="direct">
+        <div class="field">
+          <label class="label">本机地址</label>
+          <input class="input" value="127.0.0.1">
+        </div>
+        <div class="field">
+          <label class="label">本机端口<span class="req">*</span></label>
+          <input class="input" value="3306">
+          <div class="hint" style="color:var(--warn-fg);display:flex;gap:5px;align-items:flex-start">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" style="margin-top:3px;flex:none"><path d="M12 8v5M12 16h.01"/><circle cx="12" cy="12" r="9"/></svg>
+            <span>检测到本机 3306 端口没有服务在监听，代理可能无法工作</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 插件 -->
+      <div class="field hidden" data-show-backend="plugin">
+        <label class="label">插件类型</label>
+        <select class="select">
+          <option>http2https（本机 HTTPS，外部用 HTTP 访问）</option>
+          <option>https2http（本机 HTTP，外部用 HTTPS 访问）</option>
+          <option>https2https</option>
+          <option>http2http</option>
+          <option>http_proxy（把本机变成 HTTP 代理）</option>
+          <option>socks5（把本机变成 SOCKS5 代理）</option>
+          <option>static_file（直接对外提供文件服务）</option>
+          <option>unix_domain_socket</option>
+          <option>tls2raw</option>
+        </select>
+        <div class="hint">选定后会显示该插件的专属参数。此处仅展示结构，参数区未展开。</div>
+      </div>
+
+      <!-- ============ 高级选项 ============ -->
+      <div class="fold" style="margin-top:var(--s5)">
+        <button class="fold-head" onclick="this.parentElement.classList.toggle('open')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>
+          高级选项（可选）
+        </button>
+        <div class="fold-body">
+
+          <!-- 仅 http / tcpmux -->
+          <div class="grid-3" data-show-for="http,tcpmux">
+            <div class="field">
+              <label class="label">HTTP 用户名</label>
+              <input class="input" placeholder="留空则不启用">
+            </div>
+            <div class="field">
+              <label class="label">HTTP 密码</label>
+              <input class="input" type="password">
+            </div>
+            <div class="field">
+              <label class="label">按 HTTP 用户路由</label>
+              <input class="input" placeholder="留空则不启用">
+            </div>
+          </div>
+
+          <!-- 仅 http -->
+          <div data-show-for="http">
+            <div class="field">
+              <label class="label">仅转发这些路径</label>
+              <input class="input" placeholder="输入后按回车，例如 / 和 /api">
+            </div>
+            <div class="grid-2">
+              <div class="field">
+                <label class="label">改写 Host 头</label>
+                <input class="input" placeholder="例如 127.0.0.1">
+              </div>
+              <div class="field">
+                <label class="label">限速</label>
+                <input class="input" placeholder="例如 1MB，留空不限速">
+              </div>
+            </div>
+          </div>
+
+          <!-- 非 http 的限速 -->
+          <div class="field" data-show-for="tcp,udp,https,tcpmux,stcp,sudp,xtcp">
+            <label class="label">限速</label>
+            <input class="input" placeholder="例如 1MB，留空不限速">
+          </div>
+
+          <div class="grid-2">
+            <div class="field" style="display:flex;align-items:center;gap:var(--s3)">
+              <div class="switch" onclick="this.classList.toggle('on')"></div>
+              <div>
+                <div class="setting-name" style="font-size:13px">流量加密</div>
+                <div class="hint" style="margin:0">对这条代理的流量额外加密</div>
+              </div>
+            </div>
+            <div class="field" style="display:flex;align-items:center;gap:var(--s3)">
+              <div class="switch" onclick="this.classList.toggle('on')"></div>
+              <div>
+                <div class="setting-name" style="font-size:13px">健康检查</div>
+                <div class="hint" style="margin:0">后端不可用时停止发布（开启后后端必须先启动）</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">负载均衡组</label>
+            <input class="input" placeholder="同组代理会分摊流量，留空则不分组">
+          </div>
+
+          <!-- 仅 xtcp -->
+          <div class="field" data-show-for="xtcp" style="margin-bottom:0">
+            <label class="label">NAT 打洞</label>
+            <div style="display:flex;align-items:center;gap:var(--s3)">
+              <div class="switch" onclick="this.classList.toggle('on')"></div>
+              <span class="hint" style="margin:0">只用 STUN 发现的公网地址，不使用本地网卡地址（VPN 环境下可提升性能）</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" onclick="closeModal()">保存并应用</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* 页面切换（支持 URL hash，方便单独查看某一页或截图）
+   例：界面设计稿.html#logs  #settings  #visitors  #diagnose  #modal  */
+function showPage(page){
+  document.querySelectorAll('.nav-item').forEach(function(b){
+    b.classList.toggle('active', b.dataset.page === page);
+  });
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.add('hidden'); });
+  var el = document.getElementById('page-' + page);
+  if (el) el.classList.remove('hidden');
+}
+
+document.querySelectorAll('.nav-item').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    showPage(btn.dataset.page);
+    if (history.replaceState) history.replaceState(null,'','#'+btn.dataset.page);
+  });
+});
+
+/* 默认状态（必须在 initFromHash 之前，否则 hash 指定的类型会被覆盖） */
+applyTypeVisibility('tcp');
+setBackend('direct');
+
+(function initFromHash(){
+  var h = (location.hash || '').replace('#','');
+  /* #modal        → 打开弹窗（默认 tcp）
+     #modal-http   → 打开弹窗并切到 http 类型
+     #modal-stcp   → 打开弹窗并切到 stcp 类型 */
+  if (h.indexOf('modal') === 0){
+    showPage('proxies');
+    openModal();
+    var t = h.split('-')[1];
+    if (t){
+      document.querySelectorAll('.type-card').forEach(function(x){
+        x.classList.toggle('on', x.dataset.type === t);
+      });
+      applyTypeVisibility(t);
+    }
+    return;
+  }
+  if (h){ showPage(h); }
+})();
+
+/* 弹窗 */
+function openModal(){ document.getElementById('modal').classList.remove('hidden'); }
+function closeModal(){ document.getElementById('modal').classList.add('hidden'); }
+document.getElementById('modal').addEventListener('click', function(e){
+  if (e.target === this) closeModal();
+});
+
+/* token 显示切换 */
+function toggleToken(){
+  var i = document.getElementById('token-input'), b = document.getElementById('token-btn');
+  if (i.type === 'password'){ i.type = 'text'; b.textContent = '隐藏'; }
+  else { i.type = 'password'; b.textContent = '显示'; }
+}
+
+/* 类型卡片单选 + 按类型切换字段 */
+var CURRENT_TYPE = 'tcp';
+
+function applyTypeVisibility(type){
+  CURRENT_TYPE = type;
+  document.querySelectorAll('[data-show-for]').forEach(function(el){
+    var list = el.dataset.showFor.split(',');
+    el.classList.toggle('hidden', list.indexOf(type) === -1);
+  });
+}
+
+document.querySelectorAll('.type-card').forEach(function(c){
+  c.addEventListener('click', function(){
+    document.querySelectorAll('.type-card').forEach(function(x){x.classList.remove('on')});
+    c.classList.add('on');
+    applyTypeVisibility(c.dataset.type);
+  });
+});
+
+/* 后端方式切换 */
+function setBackend(mode){
+  document.querySelectorAll('.seg').forEach(function(s){
+    s.classList.toggle('on', s.dataset.backend === mode);
+  });
+  document.querySelectorAll('[data-show-backend]').forEach(function(el){
+    el.classList.toggle('hidden', el.dataset.showBackend !== mode);
+  });
+}
+
+/* 初始化（默认值已在脚本前部设置，此处不再重复调用） */
+</script>
+</body>
+</html>

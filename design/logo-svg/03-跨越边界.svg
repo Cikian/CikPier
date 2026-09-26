@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="跨越边界">
+  <title>跨越边界</title>
+  <!--
+    含义：一个服务块恰好跨在内网与公网的分界线上。
+    横线代表边界（中间被让开），方块一半在边界内、一半在边界外。
+    对应"内外网打通"。
+  -->
+  <rect x="4"  y="29" width="16" height="6" rx="3" fill="currentColor"/>
+  <rect x="44" y="29" width="16" height="6" rx="3" fill="currentColor"/>
+  <rect x="22" y="15" width="20" height="34" rx="6" fill="currentColor"/>
+</svg>

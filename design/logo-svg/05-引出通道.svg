@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="引出通道">
+  <title>引出通道</title>
+  <!--
+    含义：一条通道从底部（本机）进入，折向右侧（公网）引出，末端是出口。
+    折角是硬直角，呼应极简几何的调性。
+    对应"隧道 / 端口转发"——数据被引到外面去。
+  -->
+  <path d="M26 58 V26 H42" fill="none" stroke="currentColor" stroke-width="9" stroke-linejoin="miter"/>
+  <path d="M40 13 L58 26 L40 39 Z" fill="currentColor"/>
+</svg>

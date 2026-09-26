@@ -1,0 +1,17 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "cikpier",
+  "outputfilename": "CikPier",
+  "wailsjsdir": "./frontend",
+  "author": {
+    "name": "Cikian",
+    "email": "cikian@126.com"
+  },
+  "info": {
+    "companyName": "Cikian",
+    "productName": "CikPier",
+    "productVersion": "1.0.0",
+    "copyright": "Copyright © 2026 Cikian",
+    "comments": "frp 客户端图形界面"
+  }
+}

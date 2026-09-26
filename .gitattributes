@@ -1,0 +1,33 @@
+# 换行符策略。
+#
+# 不写这个文件的话，Windows 上 `core.autocrlf=true` 会让 git 对每个文本文件都
+# 猜一遍换行符，`git add` 时刷一大片 "LF will be replaced by CRLF" 警告，
+# 而且不同机器 clone 下来 diff 会互相打架。
+#
+# `* text=auto` = 仓库里统一存 LF，检出时按平台转换。
+* text=auto
+
+# ---------------------------------------------------------------- 明确按二进制处理
+# 不让 git 去"猜"这些是不是文本（猜错会把文件改坏）
+*.exe    binary
+*.dll    binary
+*.ico    binary
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.woff2  binary
+*.zip    binary
+
+# ---------------------------------------------------------------- Windows 脚本
+# .ps1 里含中文，**必须保留 UTF-8 BOM**（否则 PowerShell 5.1 按 ANSI 解析会报
+# 莫名其妙的语法错误）。git 不会动 BOM，这里只是声明它们是文本。
+*.ps1    text
+*.bat    text
+*.cmd    text
+
+# ---------------------------------------------------------------- 富文本
+*.md     text
+*.json   text
+*.toml   text
+*.svg    text

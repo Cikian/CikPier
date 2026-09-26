@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="两端接通">
+  <title>两端接通</title>
+  <!--
+    含义：把分隔的两端连起来。
+    左右两个方块代表内网和公网（或两台机器），中间一条粗连接杆把它们接通。
+    最直白的"桥接 / 打通"。
+  -->
+  <rect x="6"  y="21" width="19" height="22" rx="7" fill="currentColor"/>
+  <rect x="39" y="21" width="19" height="22" rx="7" fill="currentColor"/>
+  <rect x="20" y="29" width="24" height="6"  rx="3" fill="currentColor"/>
+</svg>

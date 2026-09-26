@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="穿透屏障">
+  <title>穿透屏障</title>
+  <!--
+    含义：流量穿过一道屏障。
+    屏障（上下两段竖墙）中间留出通道，横向箭头正好从缺口穿过。
+    对应 frp 把内网流量穿过防火墙送到公网。
+  -->
+  <rect x="27" y="6"    width="10" height="20" rx="3" fill="currentColor"/>
+  <rect x="27" y="38"   width="10" height="20" rx="3" fill="currentColor"/>
+  <rect x="6"  y="28.5" width="34" height="7"  rx="3.5" fill="currentColor"/>
+  <path d="M38 19 L58 32 L38 45 Z" fill="currentColor"/>
+</svg>

@@ -1,0 +1,60 @@
+# ============================================================================
+#  CikPier — 不要提交的东西
+#
+#  ⚠ 下面「运行时文件」那一组是最重要的：它们是程序在用户机器上生成的，
+#    里面**含认证令牌和代理列表**。一旦提交上去就是凭据泄露，而且 git 历史
+#    里删不干净（`git rm` 之后旧提交里还在，得 rewrite history + 轮换令牌）。
+# ============================================================================
+
+# ---------------------------------------------------------------- 构建产物
+app/build/bin/
+app/*.log
+*.bak
+*.syso
+
+# Wails 生成的 TS/JS 绑定。
+# 本项目前端是纯手写三个文件，用 `-skipbindings` 构建，**不依赖这个目录**；
+# 它只是早期某次不带 -skipbindings 的构建留下的，且源码里零引用。
+app/frontend/wailsjs/
+
+# ---------------------------------------------------------------- 分发暂存
+# dist-staging\ 里的**文档要提交**（使用说明.md / LICENSE 是打包内容），
+# 但 exe 是构建时拷进去的产物，不提交。
+dist-staging/*.exe
+
+# ---------------------------------------------------------------- 分发包产物
+release/
+*.zip
+
+# ---------------------------------------------------------------- 预览工装
+# design/preview/ 里这三个是 build-preview.ps1 从 app/frontend/src 复制过来的
+# 镜像文件，改界面请改 app/frontend/src，不要改这里（改了会被下次同步覆盖）。
+# mock.js 是手写的，要提交。
+design/preview/main.css
+design/preview/main.js
+design/preview/index.html
+design/preview/preview.html
+design/preview/assets/
+
+# ---------------------------------------------------------------- 官方二进制
+# frpc.exe / frps.exe 有一百多 MB，不进仓库。
+# 需要时从 https://github.com/fatedier/frp/releases 下载，放到
+# frp-bins/win-amd64（或 win-arm64）/ 下 —— tools/package.ps1 会去那里找。
+# arm64 那份缺失时脚本还会自动下载。
+frp-bins/
+
+# ---------------------------------------------------------------- 运行时文件（含凭据，绝不提交）
+frpc.toml
+frpc.toml.bak
+frpc-store.json
+gui-settings.json
+gui-debug.log
+frpc.log
+
+# ---------------------------------------------------------------- 编辑器 / 系统
+.idea/
+.vscode/
+.vs/
+*.user
+Thumbs.db
+desktop.ini

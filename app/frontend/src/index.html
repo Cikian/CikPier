@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CikPier</title>
+<link rel="stylesheet" href="main.css">
+</head>
+<body>
+
+<div class="app">
+  <!-- ================= 侧边栏 ================= -->
+  <aside class="sidebar">
+    <div class="brand">
+      <img class="brand-logo" src="assets/images/logo.svg" alt="" width="30" height="30">
+      <div class="brand-text">
+        <div class="brand-name">CikPier</div>
+        <div class="brand-sub" id="brand-sub">未运行</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-item active" data-page="proxies">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        代理
+        <span class="badge-count" id="nav-proxy-count">0</span>
+      </button>
+      <button class="nav-item" data-page="logs">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>
+        日志
+      </button>
+      <button class="nav-item" data-page="settings">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        设置
+      </button>
+
+      <div class="nav-group-label">进阶</div>
+      <button class="nav-item" data-page="visitors">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        访问者
+        <span class="badge-count" id="nav-visitor-count">0</span>
+      </button>
+      <button class="nav-item" data-page="diagnose">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        连接诊断
+      </button>
+      <button class="nav-item" data-page="about">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        关于
+      </button>
+    </nav>
+
+    <div class="sidebar-foot" id="sidebar-foot">未配置</div>
+  </aside>
+
+  <!-- ================= 主区 ================= -->
+  <div class="main">
+    <header class="topbar">
+      <div class="conn">
+        <span class="dot off" id="conn-dot"></span>
+        <span class="conn-text" id="conn-text">未运行</span>
+      </div>
+      <div class="conn-meta" id="conn-meta">
+        <span>服务器 <code id="meta-server">—</code></span>
+        <span>身份 <code id="meta-user">—</code></span>
+      </div>
+      <div class="topbar-spacer"></div>
+      <div class="topbar-actions">
+        <span class="muted" style="font-size:12.5px" id="last-updated"></span>
+        <button class="icon-btn" id="btn-refresh" title="立即刷新">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+        </button>
+        <button class="btn btn-ghost btn-sm" id="btn-restart" title="重启 frp 进程">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v6h6"/></svg>
+          重启
+        </button>
+        <button class="btn btn-primary btn-sm" id="btn-toggle-run">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" id="toggle-run-icon"><path d="M5 3l14 9-14 9V3z"/></svg>
+          <span id="toggle-run-text">启动</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="content" id="content">
+
+      <!-- ============ 页面 1：代理 ============ -->
+      <div class="page" id="page-proxies">
+        <div class="page-head">
+          <div>
+            <div class="page-title">代理</div>
+            <div class="page-desc">发布本机服务到公网。每条代理都可单独启用或停用。</div>
+          </div>
+          <div class="page-head-actions">
+            <button class="btn btn-ghost" id="btn-migrate">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              导入配置文件里的代理
+            </button>
+            <button class="btn btn-primary" id="btn-new-proxy">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              新建代理
+            </button>
+          </div>
+        </div>
+
+        <div id="proxy-notices"></div>
+
+        <div class="toolbar">
+          <div class="search">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input id="proxy-search" placeholder="搜索代理名称或地址…">
+          </div>
+          <select class="filter-select" id="proxy-type-filter">
+            <option value="">全部类型</option>
+            <option value="tcp">TCP</option>
+            <option value="udp">UDP</option>
+            <option value="http">HTTP</option>
+            <option value="https">HTTPS</option>
+            <option value="tcpmux">TCPMUX</option>
+            <option value="stcp">STCP</option>
+            <option value="sudp">SUDP</option>
+            <option value="xtcp">XTCP</option>
+          </select>
+          <select class="filter-select" id="proxy-status-filter">
+            <option value="">全部状态</option>
+            <option value="running">运行中</option>
+            <option value="starting">启动中</option>
+            <option value="failed">启动失败</option>
+            <option value="disabled">已停用</option>
+          </select>
+          <div style="flex:1"></div>
+          <span class="muted" style="font-size:12.5px" id="proxy-count-text"></span>
+        </div>
+
+        <div class="card">
+          <div class="list">
+            <div class="row head">
+              <div>名称</div><div>类型</div><div>本机服务</div><div>对外地址</div><div>状态</div><div style="text-align:right">操作</div>
+            </div>
+            <div id="proxy-rows"></div>
+          </div>
+          <div id="proxy-empty" class="empty hidden">
+            <div class="empty-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+            </div>
+            <div class="empty-title" id="proxy-empty-title">还没有任何代理</div>
+            <div class="empty-desc" id="proxy-empty-desc">代理用来把本机的服务发布到公网。比如把本机 3306 的 MySQL 发布出去，别人就能通过服务器地址访问它。</div>
+            <button class="btn btn-primary" id="btn-empty-new">新建第一条代理</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ 页面 2：日志 ============ -->
+      <div class="page hidden" id="page-logs">
+        <div class="page-head">
+          <div>
+            <div class="page-title">日志</div>
+            <div class="page-desc">默认显示中文摘要，点击可展开 frp 的原始英文日志。</div>
+          </div>
+          <div class="page-head-actions">
+            <button class="btn btn-ghost" id="btn-export-logs">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+              导出
+            </button>
+            <button class="btn btn-ghost" id="btn-clear-logs">清空</button>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="search">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input id="log-search" placeholder="搜索日志内容…">
+          </div>
+          <select class="filter-select" id="log-level-filter">
+            <option value="">全部级别</option>
+            <option value="error">错误</option>
+            <option value="warn">警告</option>
+            <option value="info">信息</option>
+            <option value="debug">调试</option>
+          </select>
+          <div style="flex:1"></div>
+          <label class="kv" style="cursor:pointer;user-select:none">
+            <input type="checkbox" id="log-autoscroll" checked style="cursor:pointer">
+            自动滚动
+          </label>
+          <button class="btn btn-ghost btn-sm" id="btn-pause-logs">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>
+            <span id="pause-logs-text">暂停刷新</span>
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="log-list" id="log-list"></div>
+          <div id="log-empty" class="empty hidden">
+            <div class="empty-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+            </div>
+            <div class="empty-title">暂无日志</div>
+            <div class="empty-desc">frp 运行后，这里会显示它输出的日志。启动 frp 后回来看看。</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ 页面 3：设置 ============ -->
+      <div class="page hidden" id="page-settings">
+        <div class="page-head">
+          <div>
+            <div class="page-title">设置</div>
+            <div class="page-desc">连接配置与启动选项。保存后会自动重启 frp 让改动生效。</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:var(--s5)">
+          <div class="card-head">
+            <div class="card-title">连接配置</div>
+            <div class="card-sub" id="cfg-path-hint"></div>
+          </div>
+          <div class="card-body">
+            <div class="grid-2">
+              <div class="field">
+                <label class="label">服务器地址<span class="req">*</span></label>
+                <input class="input" id="cfg-serverAddr" placeholder="frp.example.com">
+                <div class="hint">管理员提供给你的 frp 服务端域名或 IP</div>
+              </div>
+              <div class="field">
+                <label class="label">服务器端口<span class="req">*</span></label>
+                <input class="input" id="cfg-serverPort" placeholder="7000">
+                <div class="hint"><b>默认 7000</b>。只有管理员使用了非标准端口时才需要改。当前值来自你的配置文件，程序不会自动重置它。</div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="label">认证令牌 Token</label>
+              <div class="input-group">
+                <input class="input" type="password" id="cfg-authToken" placeholder="与服务端 frps.toml 里的 auth.token 保持一致">
+                <button class="btn btn-ghost" id="btn-show-token">显示</button>
+              </div>
+              <div class="hint">由管理员分配。这是访问服务器的钥匙，请勿外传或截图分享。<br><b>服务端没有开启认证时，请留空。</b></div>
+            </div>
+
+            <div class="grid-2">
+              <div class="field">
+                <label class="label">你的身份标识</label>
+                <input class="input" id="cfg-user" placeholder="例如 Cikian">
+                <div class="hint">用于在服务端区分不同客户端，代理名会自动加上此前缀</div>
+              </div>
+              <div class="field">
+                <label class="label">本机标识 clientID</label>
+                <input class="input" id="cfg-clientID" placeholder="例如 stargis-025">
+                <div class="hint">同一个身份下有多台电脑时必须填，且每台不能重复</div>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div style="display:flex;gap:var(--s2)">
+              <button class="btn btn-primary" id="btn-save-config">保存并重启 frp</button>
+              <button class="btn btn-ghost" id="btn-reload-config">放弃修改</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:var(--s5)">
+          <div class="card-head">
+            <div class="card-title">启动选项</div>
+          </div>
+          <div class="card-body" style="padding-top:0;padding-bottom:0">
+            <div class="setting-row">
+              <div class="setting-text">
+                <div class="setting-name">开机自动启动</div>
+                <div class="setting-desc">登录 Windows 后自动启动本程序，并同时拉起 frp 服务。不需要管理员权限。</div>
+              </div>
+              <div class="switch" id="sw-autostart"></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-text">
+                <div class="setting-name">关闭窗口时最小化到托盘</div>
+                <div class="setting-desc">打开后，点窗口右上角的关闭按钮会直接最小化到托盘，不再询问。关闭后 frp 不会中断，可在托盘图标上右键退出。</div>
+              </div>
+              <div class="switch" id="sw-close-to-tray"></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-text">
+                <div class="setting-name">意外退出时自动重启</div>
+                <div class="setting-desc">frp 进程异常结束（崩溃、被误杀）时自动重新拉起，最多重试 5 次。</div>
+              </div>
+              <div class="switch on" id="sw-auto-restart"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">高级</div>
+            <div class="card-sub">出问题时可以在这里排查</div>
+          </div>
+          <div class="card-body" style="display:flex;gap:var(--s2);flex-wrap:wrap">
+            <button class="btn btn-ghost" id="btn-open-official">打开官方管理页面</button>
+            <button class="btn btn-ghost" id="btn-open-folder">打开程序文件夹</button>
+            <button class="btn btn-ghost" id="btn-show-config">查看生成的配置文件</button>
+          </div>
+          <div class="card-body" style="padding-top:0">
+            <div class="hint" id="backup-hint"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ 页面 4：访问者 ============ -->
+      <div class="page hidden" id="page-visitors">
+        <div class="page-head">
+          <div>
+            <div class="page-title">访问者</div>
+            <div class="page-desc">访问别人发布的私密服务（stcp / sudp / xtcp）。</div>
+          </div>
+          <div class="page-head-actions">
+            <button class="btn btn-primary" id="btn-new-visitor">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              新建访问者
+            </button>
+          </div>
+        </div>
+
+        <div class="notice info">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <div class="notice-body">
+            <b>什么时候需要「访问者」？</b>
+            <div style="margin-top:3px;line-height:1.65">
+              只有当你要 <b>访问别人发布的私密服务</b>（stcp / sudp / xtcp）时才需要。<br>
+              配好之后，对方的服务会映射到你本机的一个端口上，像访问本地服务一样使用它。<br>
+              <span style="opacity:.85">如果你只是要发布自己的服务，用「代理」就够了，不需要这里。</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="list">
+            <div class="row head">
+              <div>名称</div><div>类型</div><div>目标服务</div><div>本机映射</div><div>状态</div><div style="text-align:right">操作</div>
+            </div>
+            <div id="visitor-rows"></div>
+          </div>
+          <div id="visitor-empty" class="empty hidden">
+            <div class="empty-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            </div>
+            <div class="empty-title">还没有配置访问者</div>
+            <div class="empty-desc">如果你不需要访问别人发布的私密服务，这里空着是完全正常的。</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ 页面 5：连接诊断 ============ -->
+      <div class="page hidden" id="page-diagnose">
+        <div class="page-head">
+          <div>
+            <div class="page-title">连接诊断</div>
+            <div class="page-desc">依次检查程序文件、配置、服务端连接和本机后端，出问题时可快速定位。</div>
+          </div>
+          <div class="page-head-actions">
+            <button class="btn btn-primary" id="btn-diagnose">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              开始诊断
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body" style="padding-top:0;padding-bottom:0" id="diag-results">
+            <div class="empty">
+              <div class="empty-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              </div>
+              <div class="empty-title">还没有诊断结果</div>
+              <div class="empty-desc">点击右上角「开始诊断」，程序会依次检查各个环节并给出结论。</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:var(--s5)">
+          <div class="card-head"><div class="card-title">环境信息</div></div>
+          <div class="card-body" style="padding-top:0;padding-bottom:0" id="env-info"></div>
+        </div>
+      </div>
+
+      <!-- ============ 页面 6：关于 ============ -->
+      <div class="page hidden" id="page-about">
+        <div class="page-head">
+          <div>
+            <div class="page-title">关于</div>
+            <div class="page-desc">了解这个程序，以及做它的人。</div>
+          </div>
+        </div>
+
+        <!-- 头部 -->
+        <div class="card about-hero">
+          <img class="about-deco" src="assets/images/logo.svg" alt="">
+          <div class="about-hero-inner">
+            <img class="about-avatar" src="assets/images/avatar.jpg" alt="Cikian">
+            <div class="about-id">
+              <div class="about-name" id="ab-name">Cikian</div>
+              <div class="about-tagline" id="ab-tagline">COURAGE ZENITH JOURNEY</div>
+              <div class="about-chips" id="ab-chips"></div>
+            </div>
+            <div class="about-cta">
+              <div class="about-links" id="ab-links"></div>
+              <button class="btn-coffee" id="ab-coffee">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M17 9h1.8a2.7 2.7 0 0 1 0 5.4H17"/><path d="M6 3.5c0 .7.7.9.7 1.6M9.5 3c0 .8.8 1 .8 1.8M13 3.5c0 .7.7.9.7 1.6"/></svg>
+                请作者喝杯咖啡
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 主体：左边介绍 + 右边版本信息 -->
+        <div class="about-body">
+          <div class="card">
+            <div class="card-head"><div class="card-title">这个程序</div></div>
+            <div class="card-body">
+              <div class="about-text">
+                这是我给 frp 写的图形界面。命令行那套配置我实在记不住，就干脆做了个窗口。
+                <div style="height:10px"></div>
+                底层用的还是官方原版的 <code>frpc.exe</code>，没动过它的源码 ——
+                想换 frp 版本，替换一个文件就行。
+              </div>
+              <div class="about-stats" id="ab-stats"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div class="card-title">版本与构建</div></div>
+            <div class="card-body" style="padding-top:var(--s4);padding-bottom:0">
+              <dl class="about-kv" id="ab-build"></dl>
+            </div>
+            <div class="card-body" style="padding-top:var(--s4)">
+              <div class="hint" id="ab-paths" style="word-break:break-all"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 许可 -->
+        <div class="card" style="margin-top:var(--s5)">
+          <div class="card-head">
+            <div class="card-title">开源许可</div>
+            <div class="card-sub">用到的开源项目</div>
+          </div>
+          <div class="card-body">
+            <div class="about-text" id="ab-license"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 代理 新建 / 编辑 弹窗 ==================== -->
+<div class="scrim hidden" id="proxy-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="pm-title">新建代理</div>
+      <div style="flex:1"></div>
+      <button class="icon-btn" data-close="proxy-modal">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="field">
+        <label class="label">代理类型<span class="req">*</span></label>
+        <div class="type-grid" id="pm-types">
+          <button class="type-card" data-type="tcp"><div class="t">TCP</div><div class="d">端口</div></button>
+          <button class="type-card" data-type="udp"><div class="t">UDP</div><div class="d">端口</div></button>
+          <button class="type-card" data-type="http"><div class="t">HTTP</div><div class="d">域名</div></button>
+          <button class="type-card" data-type="https"><div class="t">HTTPS</div><div class="d">域名</div></button>
+          <button class="type-card" data-type="tcpmux"><div class="t">TCPMUX</div><div class="d">复用</div></button>
+          <button class="type-card" data-type="stcp"><div class="t">STCP</div><div class="d">私密</div></button>
+          <button class="type-card" data-type="sudp"><div class="t">SUDP</div><div class="d">私密</div></button>
+          <button class="type-card" data-type="xtcp"><div class="t">XTCP</div><div class="d">P2P</div></button>
+        </div>
+        <div class="hint" id="pm-type-hint">不确定选哪个？发布网站选 <b>HTTP</b>，发布数据库 / 远程桌面选 <b>TCP</b>，只给特定人访问选 <b>STCP</b>。</div>
+      </div>
+
+      <div class="field">
+        <label class="label">名称<span class="req">*</span></label>
+        <input class="input" id="pf-name" placeholder="例如 mysql">
+        <div class="hint">代理的唯一标识，建议只用字母、数字和连字符</div>
+      </div>
+
+      <!-- 仅 tcp / udp -->
+      <div class="field" data-show-for="tcp,udp">
+        <label class="label">对外端口<span class="req">*</span></label>
+        <input class="input" id="pf-remotePort" placeholder="例如 20001">
+        <div class="hint" id="pf-remotePort-hint">由管理员分配。访问者通过 <span class="mono" id="pf-remotePort-eg">服务器地址:20001</span> 连到你的服务。填 0 表示让服务端随机分配。</div>
+      </div>
+
+      <!-- 仅 http / https / tcpmux -->
+      <div class="field" data-show-for="http,https,tcpmux">
+        <label class="label">自定义域名</label>
+        <div class="chips" data-chips="customDomains">
+          <input placeholder="输入域名后按回车，可填多个">
+        </div>
+        <div class="hint">需要你自己配置 DNS 解析。它与下边的「子域名」互斥，二选一即可。</div>
+      </div>
+
+      <!-- 仅 http / https -->
+      <div class="field" data-show-for="http,https">
+        <label class="label">子域名</label>
+        <input class="input" id="pf-subdomain" placeholder="例如 mysql">
+        <div class="hint" id="pf-subdomain-hint">只写最左边一段，实际访问地址由服务端拼成 <span class="mono">子域名.服务端域名</span></div>
+      </div>
+
+      <!-- 仅 tcpmux -->
+      <div class="field" data-show-for="tcpmux">
+        <label class="label">多路复用器</label>
+        <select class="select" id="pf-multiplexer">
+          <option value="httpconnect">HTTP CONNECT</option>
+        </select>
+        <div class="hint">目前仅支持 httpconnect。需要服务端开启 tcpmuxHTTPConnectPort，否则这条代理无法启动。</div>
+      </div>
+
+      <!-- 仅 stcp / sudp / xtcp -->
+      <div class="field" data-show-for="stcp,sudp,xtcp">
+        <label class="label">密钥 Secret Key<span class="req">*</span></label>
+        <div class="input-group">
+          <input class="input" type="password" id="pf-secretKey" placeholder="与访问者约定的一串字符">
+          <button class="btn btn-ghost" id="btn-show-secret">显示</button>
+          <button class="btn btn-ghost" id="btn-gen-secret">随机生成</button>
+        </div>
+        <div class="hint">访问者必须输入完全相同的密钥才能连接。密钥泄露等于服务对泄露者开放。</div>
+      </div>
+
+      <div class="field" data-show-for="stcp,sudp,xtcp">
+        <label class="label">允许访问的用户</label>
+        <div class="chips" data-chips="allowUsers">
+          <input placeholder="输入用户名后按回车">
+        </div>
+        <div class="hint">留空 = 只有 <span class="mono">user</span> 相同的访问者能连；填 <span class="mono">*</span> = 允许所有人</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="field">
+        <label class="label">后端方式</label>
+        <div style="display:flex;gap:var(--s2)">
+          <button class="seg on" data-backend="direct">直连本机端口</button>
+          <button class="seg" data-backend="plugin">使用插件</button>
+        </div>
+        <div class="hint">插件模式下不需要填本机端口，由插件负责处理连接（例如把本地 HTTP 转成 HTTPS、或直接提供文件服务）。</div>
+      </div>
+
+      <div class="grid-2" data-show-backend="direct">
+        <div class="field">
+          <label class="label">本机地址</label>
+          <input class="input" id="pf-localIP" placeholder="127.0.0.1">
+        </div>
+        <div class="field">
+          <label class="label">本机端口<span class="req">*</span></label>
+          <input class="input" id="pf-localPort" placeholder="例如 3306">
+          <div class="hint" id="pf-localPort-hint">本机上真正提供服务的端口</div>
+        </div>
+      </div>
+
+      <div class="field hidden" data-show-backend="plugin">
+        <label class="label">插件类型</label>
+        <select class="select" id="pf-pluginType">
+          <option value="http2https">http2https —— 本机 HTTPS，外部用 HTTP 访问</option>
+          <option value="https2http">https2http —— 本机 HTTP，外部用 HTTPS 访问</option>
+          <option value="https2https">https2https —— 本机 HTTPS，外部也用 HTTPS</option>
+          <option value="http2http">http2http —— 本机 HTTP，外部也用 HTTP</option>
+          <option value="http_proxy">http_proxy —— 把本机变成 HTTP 代理</option>
+          <option value="socks5">socks5 —— 把本机变成 SOCKS5 代理</option>
+          <option value="static_file">static_file —— 直接对外提供文件服务</option>
+          <option value="unix_domain_socket">unix_domain_socket —— 转发到 unix socket</option>
+          <option value="tls2raw">tls2raw —— 把本地 TCP 包装成 TLS</option>
+        </select>
+        <div id="pf-plugin-params" style="margin-top:var(--s4)"></div>
+      </div>
+
+      <div class="fold" style="margin-top:var(--s5)">
+        <button class="fold-head" type="button">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>
+          高级选项（可选）
+        </button>
+        <div class="fold-body">
+
+          <div class="grid-3" data-show-for="http,tcpmux">
+            <div class="field">
+              <label class="label">HTTP 用户名</label>
+              <input class="input" id="pf-httpUser" placeholder="留空则不启用">
+            </div>
+            <div class="field">
+              <label class="label">HTTP 密码</label>
+              <input class="input" type="password" id="pf-httpPassword">
+            </div>
+            <div class="field">
+              <label class="label">按 HTTP 用户路由</label>
+              <input class="input" id="pf-routeByHTTPUser" placeholder="留空则不启用">
+            </div>
+          </div>
+
+          <div data-show-for="http">
+            <div class="field">
+              <label class="label">仅转发这些路径</label>
+              <div class="chips" data-chips="locations">
+                <input placeholder="例如 / 或 /api，回车添加">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">改写 Host 头</label>
+              <input class="input" id="pf-hostHeaderRewrite" placeholder="例如 127.0.0.1，留空则不改">
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">限速</label>
+            <input class="input" id="pf-bandwidthLimit" placeholder="例如 1MB，留空不限速">
+            <div class="hint">限制这条代理的带宽上限，单位可用 KB / MB</div>
+          </div>
+
+          <div class="field">
+            <label class="label">负载均衡组</label>
+            <input class="input" id="pf-loadBalancerGroup" placeholder="同组代理会分摊流量，留空则不分组">
+          </div>
+
+          <div class="grid-2">
+            <div class="field" style="display:flex;align-items:center;gap:var(--s3)">
+              <div class="switch" id="sw-encryption"></div>
+              <div>
+                <div class="setting-name" style="font-size:13px">流量加密</div>
+                <div class="hint" style="margin:0">对这条代理的流量额外加密，会略微增加延迟</div>
+              </div>
+            </div>
+            <div class="field" style="display:flex;align-items:center;gap:var(--s3)">
+              <div class="switch" id="sw-compression"></div>
+              <div>
+                <div class="setting-name" style="font-size:13px">流量压缩</div>
+                <div class="hint" style="margin:0">适合文本类流量，会占用更多 CPU</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <div style="display:flex;align-items:center;gap:var(--s3)">
+              <div class="switch" id="sw-healthcheck"></div>
+              <div>
+                <div class="setting-name" style="font-size:13px">健康检查</div>
+                <div class="hint" style="margin:0">后端不可用时停止发布。⚠ 开启后必须先把本机服务启动起来，否则这条代理永远不会上线。</div>
+              </div>
+            </div>
+            <div class="grid-2 hidden" id="healthcheck-params" style="margin-top:var(--s4)">
+              <div class="field" style="margin-bottom:0">
+                <label class="label">检查间隔</label>
+                <input class="input" id="pf-hc-interval" placeholder="10s">
+              </div>
+              <div class="field" style="margin-bottom:0">
+                <label class="label">超时</label>
+                <input class="input" id="pf-hc-timeout" placeholder="3s">
+              </div>
+            </div>
+            <div class="field hidden" id="healthcheck-path-field" style="margin-top:var(--s4)">
+              <label class="label">检查路径</label>
+              <input class="input" id="pf-hc-path" placeholder="/health">
+            </div>
+          </div>
+
+          <div class="field" data-show-for="xtcp" style="margin-bottom:0">
+            <label class="label">NAT 打洞</label>
+            <div style="display:flex;align-items:center;gap:var(--s3)">
+              <div class="switch" id="sw-natTraversal"></div>
+              <span class="hint" style="margin:0">只用 STUN 发现的公网地址，不使用本地网卡地址（VPN 环境下可提升性能）</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <div class="foot-left muted" style="font-size:12.5px" id="pm-error"></div>
+      <button class="btn btn-ghost" data-close="proxy-modal">取消</button>
+      <button class="btn btn-primary" id="btn-save-proxy">保存并应用</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 访问者 新建 / 编辑 弹窗 ==================== -->
+<div class="scrim hidden" id="visitor-modal">
+  <div class="modal sm">
+    <div class="modal-head">
+      <div class="modal-title" id="vm-title">新建访问者</div>
+      <div style="flex:1"></div>
+      <button class="icon-btn" data-close="visitor-modal">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label class="label">访问者类型<span class="req">*</span></label>
+        <select class="select" id="vf-type">
+          <option value="stcp">stcp —— 私密 TCP，走服务端中转</option>
+          <option value="sudp">sudp —— 私密 UDP，走服务端中转</option>
+          <option value="xtcp">xtcp —— 点对点，速度最快</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="label">名称<span class="req">*</span></label>
+        <input class="input" id="vf-name" placeholder="例如 zhangsan-mysql">
+      </div>
+      <div class="field">
+        <label class="label">发布者身份 serverUser</label>
+        <input class="input" id="vf-serverUser" placeholder="发布这个服务的人的用户名">
+        <div class="hint">对方 <span class="mono">frpc.toml</span> 里 <span class="mono">user</span> 的值。留空表示对方没有设置身份。</div>
+      </div>
+      <div class="field">
+        <label class="label">服务名称 serverName<span class="req">*</span></label>
+        <input class="input" id="vf-serverName" placeholder="对方那条代理的名字">
+        <div class="hint">对方在「代理」页面里给这条服务起的名字（是对方起的名字，不是你看到的域名）</div>
+      </div>
+      <div class="field">
+        <label class="label">密钥 Secret Key<span class="req">*</span></label>
+        <div class="input-group">
+          <input class="input" type="password" id="vf-secretKey">
+          <button class="btn btn-ghost" id="btn-show-vsecret">显示</button>
+        </div>
+        <div class="hint">必须与发布者设置的密钥完全一致，否则连不上。</div>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label class="label">映射到本机地址</label>
+          <input class="input" id="vf-bindAddr" placeholder="127.0.0.1">
+        </div>
+        <div class="field">
+          <label class="label">映射到本机端口<span class="req">*</span></label>
+          <input class="input" id="vf-bindPort" placeholder="例如 13306">
+          <div class="hint">配好后用这个端口访问对方的服务</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <div class="foot-left muted" style="font-size:12.5px" id="vm-error"></div>
+      <button class="btn btn-ghost" data-close="visitor-modal">取消</button>
+      <button class="btn btn-primary" id="btn-save-visitor">保存并应用</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 通用确认弹窗 ==================== -->
+<div class="scrim hidden" id="confirm-modal">
+  <div class="modal sm">
+    <div class="modal-head">
+      <div class="modal-title" id="cf-title">确认</div>
+      <div style="flex:1"></div>
+      <button class="icon-btn" data-close="confirm-modal">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:13.5px" id="cf-text"></div>
+      <div class="hint hidden" id="cf-hint" style="margin-top:var(--s3)"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-close="confirm-modal">取消</button>
+      <button class="btn btn-primary" id="cf-ok">确定</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 查看配置文件弹窗 ==================== -->
+<div class="scrim hidden" id="config-modal">
+  <div class="modal lg">
+    <div class="modal-head">
+      <div class="modal-title">frpc.toml</div>
+      <div class="card-sub" id="cm-path"></div>
+      <div style="flex:1"></div>
+      <button class="icon-btn" data-close="config-modal">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="hint" style="margin-bottom:var(--s3)">这个文件由程序自动生成并维护。代理不在这里，它们存在 frpc-store.json 里。</div>
+      <textarea class="textarea" id="cm-content" readonly style="min-height:340px"></textarea>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-close="config-modal">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 请作者喝杯咖啡 ==================== -->
+<div class="scrim hidden" id="donate-modal">
+  <div class="modal sm">
+    <div class="modal-head">
+      <div class="modal-title">请作者喝杯咖啡</div>
+      <div style="flex:1"></div>
+      <button class="icon-btn" data-close="donate-modal">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="text-align:center">
+      <div class="donate-qr-wrap">
+        <img class="donate-qr" src="assets/images/donate-qr.jpg" alt="微信收款码">
+      </div>
+      <div class="donate-title">微信扫一扫</div>
+      <div class="donate-desc">
+        如果这个小工具帮你省下了时间，<br>
+        可以请我喝杯咖啡 ☕ 你的支持是我继续维护它的动力。
+      </div>
+      <div class="donate-note">
+        这是微信收款码，金额随意。不打赏也完全不影响使用 —— 它本来就是个自由软件。
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-close="donate-modal">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 官方管理页面凭据 ==================== -->
+<div class="scrim hidden" id="panel-modal">
+  <div class="modal sm">
+    <div class="modal-head">
+      <div class="modal-title">官方管理页面</div>
+      <div style="flex:1"></div>
+      <button class="icon-btn" data-close="panel-modal">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="notice info" style="margin-bottom:var(--s4)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        <div class="notice-body" style="font-size:12.5px">
+          这是 frp 自带的管理界面，用来兜底本程序没覆盖到的冷门功能。<br>
+          浏览器打开时会弹一个登录框 —— <b>用户名和密码就是下面这两个</b>，填一次之后浏览器会记住。
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">访问地址</label>
+        <div class="input-group">
+          <input class="input" id="pi-url" readonly>
+          <button class="btn btn-ghost" id="btn-copy-url">复制</button>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">用户名</label>
+        <div class="input-group">
+          <input class="input" id="pi-user" readonly>
+          <button class="btn btn-ghost" id="btn-copy-user">复制</button>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">密码</label>
+        <div class="input-group">
+          <input class="input" id="pi-pass" readonly>
+          <button class="btn btn-ghost" id="btn-copy-pass">复制</button>
+        </div>
+        <div class="hint" id="pi-hint"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <div class="foot-left muted" style="font-size:12px" id="pi-state"></div>
+      <button class="btn btn-ghost" data-close="panel-modal">关闭</button>
+      <button class="btn btn-primary" id="btn-open-panel">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M18 14v5a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 19V7.5A1.5 1.5 0 0 1 5 6h5"/></svg>
+        复制密码并打开
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 首次配置向导 ==================== -->
+<div class="wizard hidden" id="wizard">
+  <div class="wizard-body">
+    <div class="wizard-inner">
+      <div class="wizard-steps">
+        <div class="wizard-step on" data-step="1"></div>
+        <div class="wizard-step" data-step="2"></div>
+        <div class="wizard-step" data-step="3"></div>
+      </div>
+
+      <div id="wz-1">
+        <div class="wizard-mark">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h10M4 17h7"/></svg>
+        </div>
+        <div class="wizard-title">欢迎使用 CikPier</div>
+        <div class="wizard-desc">
+          这个程序帮你把本机的服务（网站、数据库、远程桌面…）发布到公网，<br>
+          全程图形化操作，不需要手写配置文件。
+        </div>
+
+        <div class="card" style="margin-bottom:var(--s5)">
+          <div class="card-body" style="padding-top:0;padding-bottom:0">
+            <div class="setting-row">
+              <div class="diag-icon warn" id="wz-exe-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 8v5M12 16h.01"/></svg>
+              </div>
+              <div class="setting-text">
+                <div class="setting-name">frp 主程序</div>
+                <div class="setting-desc" id="wz-exe-desc">正在检查…</div>
+              </div>
+            </div>
+            <div class="setting-row">
+              <div class="diag-icon ok">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+              </div>
+              <div class="setting-text">
+                <div class="setting-name">接下来要填三样东西</div>
+                <div class="setting-desc">服务器地址、服务器端口、认证令牌 Token —— 都由管理员提供给你<br>服务端没有开启认证时，令牌留空即可</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="notice info" style="margin-bottom:0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <div class="notice-body">
+            程序会把配置文件生成在它自己所在的文件夹里，你随时可以打开查看。
+          </div>
+        </div>
+      </div>
+
+      <div id="wz-2" class="hidden">
+        <div class="wizard-title">填写连接信息</div>
+        <div class="wizard-desc">这些信息由 frp 服务端管理员提供。</div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label class="label">服务器地址<span class="req">*</span></label>
+            <input class="input" id="wz-serverAddr" placeholder="frp.example.com">
+          </div>
+          <div class="field">
+            <label class="label">服务器端口<span class="req">*</span></label>
+            <input class="input" id="wz-serverPort" value="7000">
+            <div class="hint">不确定就填 <b>7000</b></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">认证令牌 Token</label>
+          <div class="input-group">
+            <input class="input" type="password" id="wz-authToken">
+            <button class="btn btn-ghost" id="wz-show-token">显示</button>
+          </div>
+          <div class="hint">服务端 <span class="mono">frps.toml</span> 里 <span class="mono">auth.token</span> 的值，必须完全一致。<br><b>服务端没有认证（没配 auth.token）时，这里请留空。</b></div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label class="label">你的身份标识</label>
+            <input class="input" id="wz-user" placeholder="例如 Cikian">
+            <div class="hint">管理员分配给你的名字，留空也能用</div>
+          </div>
+          <div class="field">
+            <label class="label">本机标识 clientID</label>
+            <input class="input" id="wz-clientID" placeholder="例如 stargis-025">
+            <div class="hint">多台电脑共用一个身份时必填，每台不能重复</div>
+          </div>
+        </div>
+
+        <div class="notice err hidden" id="wz-error" style="margin-bottom:0"></div>
+      </div>
+
+      <div id="wz-3" class="hidden">
+        <div class="wizard-mark">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        </div>
+        <div class="wizard-title">配置完成</div>
+        <div class="wizard-desc" id="wz-done-desc">配置文件已生成，正在启动 frp…</div>
+
+        <div class="card">
+          <div class="card-body" style="padding-top:0;padding-bottom:0" id="wz-done-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wizard-foot">
+    <div class="foot-left" id="wz-foot-left">第 1 步 / 共 3 步</div>
+    <button class="btn btn-ghost hidden" id="wz-prev">上一步</button>
+    <button class="btn btn-primary" id="wz-next">下一步</button>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script src="main.js"></script>
+</body>
+</html>
