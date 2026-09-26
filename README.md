@@ -56,6 +56,9 @@
 
 不确定是哪种？打开 **设置 → 系统 → 关于**，看「系统类型」那一行。
 
+> 🪞 **国内打不开 GitHub？** 去 Gitee 发行版下载同样两个文件：
+> https://gitee.com/cikian/CikPier/releases
+
 然后：
 
 1. **解压到任意文件夹** —— 建议不要放 `C:\Program Files\`，那里每次操作都要管理员权限

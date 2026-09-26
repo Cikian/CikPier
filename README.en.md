@@ -65,6 +65,9 @@ Grab the build matching your CPU from [Releases](https://github.com/Cikian/CikPi
 
 Not sure which? **Settings → System → About**, look at "System type".
 
+> 🪞 **Can't reach GitHub?** The same two archives are on Gitee:
+> https://gitee.com/cikian/CikPier/releases
+
 Then:
 
 1. **Unzip anywhere** — avoid `C:\Program Files\`, which triggers admin prompts
