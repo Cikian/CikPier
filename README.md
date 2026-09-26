@@ -1,5 +1,7 @@
 # CikPier
 
+**中文** · [English](README.en.md)
+
 **给 frp 做的 Windows 图形客户端 —— 不碰配置文件、不出黑窗口、全中文。**
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
